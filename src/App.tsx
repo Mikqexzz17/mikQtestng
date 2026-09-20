@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Download, Code2, Activity, MessageSquare, Plus, Play, Settings, Key, Zap, CheckCircle2, Circle, Send, Gamepad2, Box, Layers, PlayCircle, Terminal, FileCode2, Sparkles, Wand2 } from 'lucide-react';
+import { Download, Code2, Activity, MessageSquare, Plus, Save, Play, Settings, Key, Zap, CheckCircle2, Circle, Send, Gamepad2, Box, Layers, PlayCircle, Terminal, FileCode2, Sparkles, Wand2, User, Clock, Share } from 'lucide-react';
 
 type Mode = 'model' | 'api' | 'game' | null;
 
@@ -20,6 +20,12 @@ const mikQModels: Model[] = [
   { id: '1', name: 'Llama-2-7b-chat', source: 'huggingface' },
   { id: '2', name: 'Mistral-7B-v0.1', source: 'huggingface' },
   { id: '3', name: 'Local-Custom-Model', source: 'local' },
+];
+
+const mockRecentProjects = [
+  { id: 'p1', name: 'Alpha LLM Tuning', type: 'model', date: '2 godziny temu', icon: Activity, color: 'text-blue-400' },
+  { id: 'p2', name: 'React UI Generator', type: 'api', date: 'Wczoraj', icon: Zap, color: 'text-emerald-400' },
+  { id: 'p3', name: 'CyberQuest Level 1', type: 'game', date: '3 dni temu', icon: Gamepad2, color: 'text-pink-400' },
 ];
 
 function App() {
@@ -60,6 +66,15 @@ function App() {
   const [godotConsole, setGodotConsole] = useState<string[]>(['Godot Engine v4.2.1.stable.official', 'OpenGL API 3.3.0', 'Project "Untitled" loaded.']);
   const [godotScene, setGodotScene] = useState<'empty' | 'player' | 'level'>('empty');
   const [isAiWorking, setIsAiWorking] = useState(false);
+
+  const handleLoadProject = (project: typeof mockRecentProjects[0]) => {
+    setAppMode(project.type as Mode);
+    setTemplateName(project.name);
+    if (project.type === 'model') {
+      setSelectedModel(mikQModels[0]);
+    }
+    setIsTemplateCreated(true);
+  };
 
   const handleCreateTemplate = () => {
     if (appMode === 'model' && templateName && selectedModel) {
@@ -223,6 +238,33 @@ function App() {
     }, 1000);
   };
 
+  const TopNav = () => (
+    <nav className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center z-50 animate-fade-in">
+      <div className="flex items-center gap-2">
+        <Activity className="w-8 h-8 text-blue-500" />
+        <span className="text-2xl font-black tracking-tight text-white">mikQ <span className="font-light text-gray-400">Hub</span></span>
+      </div>
+      <div className="flex items-center gap-4">
+        <button className="text-gray-400 hover:text-white transition-colors p-2 bg-gray-900/50 rounded-full border border-gray-800">
+           <Settings className="w-5 h-5" />
+        </button>
+        <button className="text-gray-400 hover:text-white transition-colors p-2 bg-gray-900/50 rounded-full border border-gray-800">
+           <User className="w-5 h-5" />
+        </button>
+      </div>
+    </nav>
+  );
+
+  const WorkspaceHeaderControls = () => (
+    <div className="flex items-center gap-3">
+      <button className="text-gray-400 hover:text-white transition-colors p-2 bg-gray-950 rounded-lg border border-gray-800 flex items-center gap-2 text-sm shadow-sm hover:bg-gray-800">
+         <Share className="w-4 h-4" /> Udostępnij
+      </button>
+      <button className="bg-gray-800 hover:bg-gray-700 text-white transition-colors p-2 rounded-lg border border-gray-700 flex items-center gap-2 text-sm shadow-sm">
+         <Save className="w-4 h-4" /> Zapisz
+      </button>
+    </div>
+  );
 
   // --- RENDERING ---
 
@@ -233,19 +275,23 @@ function App() {
         <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-blue-900/20 rounded-full blur-[120px] animate-pulse"></div>
         <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-purple-900/20 rounded-full blur-[120px] animate-pulse" style={{animationDelay: '1s'}}></div>
 
-        <div className="max-w-5xl w-full relative z-10 animate-fade-in-up">
-           <div className="text-center mb-16">
+        <TopNav />
+
+        <div className="max-w-6xl w-full relative z-10 pt-16 flex flex-col items-center">
+
+           <div className="text-center mb-12 animate-fade-in-up">
              <div className="flex items-center justify-center gap-3 mb-6">
                <div className="relative">
-                 <Activity className="w-14 h-14 text-blue-500" />
+                 <Activity className="w-16 h-16 text-blue-500" />
                  <Sparkles className="w-6 h-6 text-purple-400 absolute -top-2 -right-2 animate-bounce" />
                </div>
-               <h1 className="text-6xl font-black bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent tracking-tighter">mikQ Studio</h1>
+               <h1 className="text-7xl font-black bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500 bg-clip-text text-transparent tracking-tighter">mikQ</h1>
              </div>
-             <p className="text-gray-400 text-xl font-light">Wybierz architekturę dla swojego nowego projektu</p>
+             <p className="text-gray-400 text-xl font-light max-w-2xl mx-auto">Zaawansowana platforma do tworzenia, fine-tuningu i orkiestracji modeli AI.</p>
            </div>
 
-           <div className="grid md:grid-cols-3 gap-8">
+           {/* Main Architecture Choices */}
+           <div className="grid lg:grid-cols-3 gap-8 w-full mb-16 animate-fade-in-up" style={{animationDelay: '0.1s'}}>
               <button
                 onClick={() => setAppMode('model')}
                 className="group relative bg-gray-900/50 backdrop-blur-sm border border-gray-800 hover:border-blue-500/50 p-8 rounded-3xl transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_20px_40px_-15px_rgba(59,130,246,0.2)] text-left flex flex-col"
@@ -259,7 +305,7 @@ function App() {
                   </div>
                   Model AI
                 </h3>
-                <p className="text-gray-400 flex-1 leading-relaxed">Trenuj i fine-tuninguj modele AI z użyciem potężnego, 4-okienkowego interfejsu. Idealne do tworzenia własnych LLM.</p>
+                <p className="text-gray-400 flex-1 leading-relaxed">Trenuj i fine-tuninguj modele AI z użyciem potężnego interfejsu. Idealne do tworzenia własnych LLM.</p>
               </button>
 
               <button
@@ -275,7 +321,7 @@ function App() {
                   </div>
                   Szablon API
                 </h3>
-                <p className="text-gray-400 flex-1 leading-relaxed">Podłącz wiele kluczy API i zlecaj złożone zadania Głównemu modelowi, który wygeneruje kod z pomocą sub-agentów.</p>
+                <p className="text-gray-400 flex-1 leading-relaxed">Podłącz klucze API i zlecaj zadania Głównemu modelowi, który wygeneruje kod z pomocą sub-agentów.</p>
               </button>
 
               <button
@@ -294,6 +340,34 @@ function App() {
                 <p className="text-gray-400 flex-1 leading-relaxed">Wbudowany Godot Engine z pełną integracją AI. Zleć modelowi budowę scen i pisanie skryptów w czasie rzeczywistym.</p>
               </button>
            </div>
+
+           {/* Recent Projects */}
+           <div className="w-full animate-fade-in-up" style={{animationDelay: '0.2s'}}>
+             <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <Clock className="w-5 h-5 text-gray-400" /> Ostatnie Projekty
+                </h2>
+                <button className="text-sm text-gray-400 hover:text-white transition-colors">Zobacz wszystkie</button>
+             </div>
+
+             <div className="grid md:grid-cols-3 gap-4">
+               {mockRecentProjects.map((project) => (
+                 <button
+                    key={project.id}
+                    onClick={() => handleLoadProject(project)}
+                    className="bg-gray-900/40 hover:bg-gray-800 border border-gray-800 hover:border-gray-700 p-4 rounded-2xl flex items-center gap-4 transition-all duration-300 text-left group"
+                 >
+                   <div className={`p-3 rounded-xl bg-gray-950 border border-gray-800 group-hover:scale-110 transition-transform ${project.color}`}>
+                     <project.icon className="w-5 h-5" />
+                   </div>
+                   <div>
+                     <h4 className="font-semibold text-gray-200 group-hover:text-white transition-colors">{project.name}</h4>
+                     <p className="text-xs text-gray-500 mt-1">{project.date}</p>
+                   </div>
+                 </button>
+               ))}
+             </div>
+           </div>
         </div>
       </div>
     );
@@ -301,8 +375,9 @@ function App() {
 
   if (!isTemplateCreated) {
     return (
-      <div className="min-h-screen bg-gray-950 text-white p-8 flex items-center justify-center font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 to-gray-950">
-        <div className="bg-gray-900/70 backdrop-blur-2xl p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-800 animate-fade-in-up">
+      <div className="min-h-screen bg-gray-950 text-white p-8 flex items-center justify-center font-sans bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-gray-900 to-gray-950 relative overflow-hidden">
+        <TopNav />
+        <div className="bg-gray-900/70 backdrop-blur-2xl p-10 rounded-3xl shadow-2xl max-w-md w-full border border-gray-800 animate-fade-in-up z-10">
           <button onClick={() => setAppMode(null)} className="text-sm text-gray-400 hover:text-white mb-8 flex items-center gap-1 transition-colors">
              &larr; Wróć
           </button>
@@ -450,18 +525,20 @@ function App() {
       <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col font-sans h-screen">
         <header className="bg-gray-900/95 backdrop-blur-md border-b border-gray-800 p-4 flex justify-between items-center h-16 shrink-0 z-20">
           <div className="flex items-center gap-4">
+             <button onClick={() => setAppMode(null)} className="text-gray-400 hover:text-white mr-2"><div className="rotate-180">➜</div></button>
             <div className="flex items-center gap-2">
                <Gamepad2 className="w-6 h-6 text-pink-500 animate-pulse" />
                <span className="font-bold text-xl text-white tracking-tight">mikQ <span className="font-light text-gray-400">Game</span></span>
             </div>
             <div className="h-6 w-px bg-gray-700 mx-2"></div>
             <span className="font-medium text-pink-50">{templateName}</span>
+             {mainApi && (
+              <div className="flex items-center gap-2 text-sm bg-pink-950/50 text-pink-400 px-4 py-1.5 rounded-full border border-pink-900/50 shadow-inner ml-2">
+                <Zap className="w-4 h-4" /> AI: <strong>{mainApi.name}</strong>
+              </div>
+            )}
           </div>
-          {mainApi && (
-            <div className="flex items-center gap-2 text-sm bg-pink-950/50 text-pink-400 px-4 py-1.5 rounded-full border border-pink-900/50 shadow-inner">
-              <Zap className="w-4 h-4" /> AI: <strong>{mainApi.name}</strong>
-            </div>
-          )}
+          <WorkspaceHeaderControls />
         </header>
 
         <div className="flex-1 p-4 flex gap-4 min-h-0 overflow-hidden">
@@ -593,6 +670,7 @@ function App() {
       <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col font-sans">
         <header className="bg-gray-900/90 backdrop-blur-md border-b border-gray-800 p-4 flex justify-between items-center h-16 sticky top-0 z-10">
           <div className="flex items-center gap-4">
+            <button onClick={() => setAppMode(null)} className="text-gray-400 hover:text-white mr-2"><div className="rotate-180">➜</div></button>
             <div className="flex items-center gap-2">
                <Zap className="w-6 h-6 text-emerald-500" />
                <span className="font-bold text-xl text-white">mikQ <span className="font-light text-gray-400">API</span></span>
@@ -600,6 +678,7 @@ function App() {
             <div className="h-6 w-px bg-gray-700 mx-2"></div>
             <span className="font-medium text-emerald-50">{templateName}</span>
           </div>
+          <WorkspaceHeaderControls />
         </header>
 
         <div className="flex-1 max-w-7xl w-full mx-auto p-6 flex gap-6 h-[calc(100vh-4rem)]">
@@ -773,6 +852,7 @@ function App() {
     <div className="min-h-screen bg-gray-950 text-gray-100 flex flex-col font-sans">
       <header className="bg-gray-900/95 backdrop-blur-md border-b border-gray-800 p-4 flex justify-between items-center h-16 sticky top-0 z-20">
         <div className="flex items-center gap-4">
+          <button onClick={() => setAppMode(null)} className="text-gray-400 hover:text-white mr-2"><div className="rotate-180">➜</div></button>
           <div className="flex items-center gap-2">
              <Activity className="w-6 h-6 text-blue-500" />
              <span className="font-bold text-xl tracking-tight">mikQ <span className="font-light text-gray-400">Model</span></span>
@@ -784,7 +864,9 @@ function App() {
           </span>
         </div>
 
-        <div>
+        <div className="flex items-center gap-4">
+          <WorkspaceHeaderControls />
+          <div className="w-px h-6 bg-gray-800 mx-1"></div>
           {!isModelDownloaded ? (
             <button
               onClick={handleDownloadModel}
